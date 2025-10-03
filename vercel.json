@@ -28,8 +28,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "ADMIN_PASSWORD": "@admin-password"
-  }
+  ]
 }
