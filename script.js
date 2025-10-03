@@ -1561,8 +1561,8 @@ function loadSavedChanges() {
                 }
             });
             
-            // Handle new skill categories and skills that were added
-            loadNewSkillsAndCategories(portfolioData);
+            // Temporarily disabled automatic skill reconstruction to prevent mix-ups
+            // loadNewSkillsAndCategories(portfolioData);
         }
     } catch (error) {
         console.error('Error loading saved changes:', error);
