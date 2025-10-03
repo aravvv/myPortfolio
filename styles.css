@@ -508,6 +508,9 @@ body {
     margin-left: 280px;
     padding: 24px 32px;
     background: linear-gradient(180deg, #1db954 0%, #121212 300px);
+    max-width: calc(100vw - 280px);
+    overflow-x: hidden;
+    position: relative;
 }
 
 /* Hero Section */
@@ -1212,8 +1215,9 @@ html {
 .skill-category.expanded {
     min-width: 400px;
     transform: scale(1.05);
-    z-index: 100;
+    z-index: 10;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(29, 185, 84, 0.2);
+    position: relative;
 }
 
 .skill-category.expanded .skill-tags {
