@@ -508,9 +508,10 @@ body {
     margin-left: 280px;
     padding: 24px 32px;
     background: linear-gradient(180deg, #1db954 0%, #121212 300px);
-    max-width: calc(100vw - 280px);
+    width: calc(100vw - 280px);
     overflow-x: hidden;
     position: relative;
+    box-sizing: border-box;
 }
 
 /* Hero Section */
