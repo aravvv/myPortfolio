@@ -72,8 +72,6 @@ Convert text to natural-sounding speech with multiple voice options using NLP te
 - **Deployment**: GitHub Pages
 - **CI/CD**: GitHub Actions
 
-## 📄 License
-This project is open source and available under the [MIT License](LICENSE).
 
 ---
 ⭐ **Star this repository if you found it helpful!**

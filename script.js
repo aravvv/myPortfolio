@@ -16,7 +16,7 @@ const playlist = [
     {
         title: "Chill Lofi Beat",
         artist: "Lofi Hip Hop",
-        src: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav", // Placeholder - will be replaced
+        src: "https://www.bensound.com/bensound-music/bensound-slowmotion.mp3",
         duration: 180
     },
     {
@@ -28,7 +28,7 @@ const playlist = [
     {
         title: "Peaceful Piano",
         artist: "Relaxing Sounds",
-        src: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav", // Placeholder
+        src: "https://www.bensound.com/bensound-music/bensound-relaxing.mp3",
         duration: 200
     },
     {
@@ -40,7 +40,7 @@ const playlist = [
     {
         title: "Acoustic Dreams",
         artist: "Indie Folk",
-        src: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav", // Placeholder
+        src: "https://www.bensound.com/bensound-music/bensound-sunny.mp3",
         duration: 190
     }
 ];
