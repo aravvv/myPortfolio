@@ -588,8 +588,62 @@ function initializeParallaxEffect() {
     });
 }
 
+// Skills Carousel Navigation
+function initializeSkillsCarousel() {
+    const skillsCarousel = document.getElementById('skillsCarousel');
+    const prevBtn = document.getElementById('prevCarousel');
+    const nextBtn = document.getElementById('nextCarousel');
+    
+    if (!skillsCarousel || !prevBtn || !nextBtn) return;
+    
+    const scrollAmount = 350; // Amount to scroll per click
+    
+    prevBtn.addEventListener('click', () => {
+        skillsCarousel.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+        });
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        skillsCarousel.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+    });
+    
+    // Add keyboard navigation
+    skillsCarousel.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prevBtn.click();
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextBtn.click();
+        }
+    });
+    
+    // Update button states based on scroll position
+    function updateButtonStates() {
+        const maxScroll = skillsCarousel.scrollWidth - skillsCarousel.clientWidth;
+        const currentScroll = skillsCarousel.scrollLeft;
+        
+        prevBtn.style.opacity = currentScroll <= 0 ? '0.5' : '1';
+        nextBtn.style.opacity = currentScroll >= maxScroll ? '0.5' : '1';
+    }
+    
+    skillsCarousel.addEventListener('scroll', updateButtonStates);
+    window.addEventListener('resize', updateButtonStates);
+    
+    // Initial button state update
+    setTimeout(updateButtonStates, 100);
+}
+
 // Additional interactive features
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize skills carousel
+    initializeSkillsCarousel();
+    
     // Add click effects to cards
     const cards = document.querySelectorAll('.skill-category, .experience-card, .project-card, .certification-card');
     
