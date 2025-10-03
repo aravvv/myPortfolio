@@ -1543,51 +1543,21 @@ function loadSavedChanges() {
         const portfolioData = JSON.parse(savedData);
         console.log('Loading saved changes:', portfolioData);
         
-        // Apply saved changes to elements
+        // Apply saved changes to elements with improved matching
         if (portfolioData.content) {
             Object.keys(portfolioData.content).forEach(key => {
                 const elementData = portfolioData.content[key];
                 
-                // Find element by selector or fallback methods
-                let element = null;
+                // Skip if data is invalid
+                if (!elementData.text || !elementData.tagName) return;
                 
-                // Try to find by selector first
-                if (elementData.selector) {
-                    try {
-                        element = document.querySelector(elementData.selector);
-                    } catch (e) {
-                        // Selector might be invalid, continue with other methods
-                    }
-                }
+                // Find element using precise matching
+                let element = findElementPrecisely(elementData);
                 
-                // If not found by selector, try finding by content match
-                if (!element && elementData.text) {
-                    const allElements = document.querySelectorAll(
-                        'h1, h2, h3, .hero-subtitle, .description, .project-description, ' +
-                        '.company, .duration, .education-school, .education-grade, ' +
-                        '.stat-number, .stat-label, .cert-info h3, .skill-tag, .skill-category h3'
-                    );
-                    
-                    // Find element with similar original content
-                    for (let el of allElements) {
-                        const originalText = el.textContent.trim();
-                        const savedText = elementData.text.trim();
-                        
-                        // Match by tag name and similar content (allowing for some differences)
-                        if (el.tagName === elementData.tagName && 
-                            (originalText === savedText || 
-                             originalText.includes(savedText.substring(0, 10)) ||
-                             savedText.includes(originalText.substring(0, 10)))) {
-                            element = el;
-                            break;
-                        }
-                    }
-                }
-                
-                // Apply changes if element found
-                if (element && elementData.text !== element.textContent) {
+                // Apply changes if element found and text is different
+                if (element && elementData.text.trim() !== element.textContent.trim()) {
                     console.log('Updating element:', element, 'with text:', elementData.text);
-                    element.textContent = elementData.text;
+                    element.textContent = elementData.text.trim();
                 }
             });
             
@@ -1597,6 +1567,83 @@ function loadSavedChanges() {
     } catch (error) {
         console.error('Error loading saved changes:', error);
     }
+}
+
+// Precise element finding function
+function findElementPrecisely(elementData) {
+    // Try exact selector match first
+    if (elementData.selector) {
+        try {
+            const element = document.querySelector(elementData.selector);
+            if (element && element.tagName === elementData.tagName) {
+                return element;
+            }
+        } catch (e) {
+            // Invalid selector, continue
+        }
+    }
+    
+    // Use unique ID if available
+    if (elementData.uniqueId) {
+        const allElements = document.querySelectorAll(elementData.tagName.toLowerCase());
+        for (let el of allElements) {
+            const currentUniqueId = generateUniqueId(el);
+            if (currentUniqueId === elementData.uniqueId) {
+                return el;
+            }
+        }
+    }
+    
+    // Fallback: match by tag, parent context, and original content
+    if (elementData.parentSelector && elementData.text) {
+        try {
+            const parentElement = document.querySelector(elementData.parentSelector);
+            if (parentElement) {
+                const childElements = parentElement.querySelectorAll(elementData.tagName.toLowerCase());
+                for (let el of childElements) {
+                    // For skill tags, be very specific about matching
+                    if (elementData.tagName === 'SPAN' && el.classList.contains('skill-tag')) {
+                        // Only match if this exact skill tag exists in original content
+                        const originalSkillTags = getOriginalSkillTags();
+                        if (originalSkillTags.includes(elementData.text.trim())) {
+                            return el;
+                        }
+                    } else {
+                        // For other elements, use position and content matching
+                        const currentText = el.textContent.trim();
+                        if (currentText === elementData.text.trim()) {
+                            return el;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            // Invalid parent selector
+        }
+    }
+    
+    return null;
+}
+
+// Get original skill tags to prevent cross-contamination
+function getOriginalSkillTags() {
+    // Define the original skills that should exist
+    const originalSkills = [
+        'Python', 'C', 'Java (Basics)', 'HTML', 'CSS',
+        'Amazon Web Services (AWS)', 'SQL', 'MongoDB',
+        'Large Language Models (LLMs)', 'Agentic AI', 'OpenCV',
+        'Flask', 'Pandas', 'NumPy', 'TensorFlow', 'Scikit-learn', 'LangChain',
+        'n8n', 'Selenium', 'Web Scraping', 'API Development & Integration',
+        'Website Automation', 'AI Chatbot Development',
+        'Arduino', 'Raspberry Pi', 'Robotics',
+        'Git', 'GitHub', 'Microsoft Excel', 'Power BI', 'Tableau',
+        'Communication', 'Leadership and Team Management',
+        'Presentation Design (Microsoft PowerPoint)', 'Canva', 'Video Editing',
+        'Digital Audio Workstation (Cakewalk by BandLab)', 'MIDI Programming',
+        'Audio Interfaces & Monitoring', 'Guitar', 'Piano'
+    ];
+    
+    return originalSkills;
 }
 
 // Load new skills and categories that were added in admin mode
