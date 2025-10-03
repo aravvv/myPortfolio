@@ -566,7 +566,7 @@ body::before {
 .main-content {
     flex: 1;
     margin-left: 280px;
-    padding: 24px 32px;
+    padding: 0;
     background: linear-gradient(180deg, #1db954 0%, #121212 300px);
     overflow-x: hidden;
     position: relative;
@@ -629,9 +629,9 @@ body::before {
 
 /* Content Sections */
 .content-section {
-    margin-bottom: 64px;
-    background-color: #121212;
-    border-radius: 8px;
+    margin-bottom: 0;
+    background: transparent;
+    border-radius: 0;
     padding: 32px;
 }
 
