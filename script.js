@@ -289,28 +289,100 @@ function performSearch(query) {
     const sections = document.querySelectorAll('.content-section');
     let hasResults = false;
     
+    // Enhanced search that includes partial matches and multiple keywords
+    const searchTerms = query.split(' ').filter(term => term.length > 0);
+    
     sections.forEach(section => {
-        const content = section.textContent.toLowerCase();
-        const cards = section.querySelectorAll('.skill-tag, .experience-card, .project-card, .certification-card');
+        const sectionContent = section.textContent.toLowerCase();
+        const cards = section.querySelectorAll('.skill-tag, .experience-card, .project-card, .certification-card, .skill-category');
         let sectionHasMatch = false;
+        
+        // Check if section title matches
+        const sectionTitle = section.querySelector('h2, h3');
+        if (sectionTitle && sectionTitle.textContent.toLowerCase().includes(query)) {
+            sectionHasMatch = true;
+        }
         
         cards.forEach(card => {
             const cardContent = card.textContent.toLowerCase();
+            let cardMatches = false;
+            
+            // Check for exact match first
             if (cardContent.includes(query)) {
+                cardMatches = true;
+            } else {
+                // Check for partial matches with all search terms
+                cardMatches = searchTerms.every(term => cardContent.includes(term));
+            }
+            
+            // Also check for common abbreviations and synonyms
+            const synonyms = {
+                'ai': ['artificial intelligence', 'machine learning', 'ml'],
+                'ml': ['machine learning', 'artificial intelligence', 'ai'],
+                'nlp': ['natural language processing'],
+                'cv': ['computer vision', 'opencv'],
+                'db': ['database', 'mongodb', 'sql'],
+                'js': ['javascript'],
+                'py': ['python'],
+                'react': ['reactjs', 'react.js'],
+                'git': ['github', 'version control'],
+                'aws': ['amazon web services', 'cloud'],
+                'ocr': ['optical character recognition'],
+                'bot': ['telegram bot', 'chatbot'],
+                'audio': ['music', 'sound', 'midi', 'daw'],
+                'iot': ['internet of things', 'raspberry pi', 'arduino']
+            };
+            
+            // Check synonyms
+            if (!cardMatches) {
+                for (const [key, values] of Object.entries(synonyms)) {
+                    if (query.includes(key)) {
+                        cardMatches = values.some(synonym => cardContent.includes(synonym));
+                        if (cardMatches) break;
+                    }
+                    if (values.some(value => query.includes(value))) {
+                        cardMatches = cardContent.includes(key);
+                        if (cardMatches) break;
+                    }
+                }
+            }
+            
+            if (cardMatches) {
                 card.style.display = '';
                 card.classList.add('search-highlight');
                 sectionHasMatch = true;
                 hasResults = true;
+                
+                // If it's a skill category, show all skills in that category
+                if (card.classList.contains('skill-category')) {
+                    const skillTags = card.querySelectorAll('.skill-tag');
+                    skillTags.forEach(tag => {
+                        tag.style.display = '';
+                    });
+                }
             } else {
                 card.style.display = 'none';
                 card.classList.remove('search-highlight');
             }
         });
         
-        if (content.includes(query) || sectionHasMatch) {
+        // Show section if it has matches or if the query matches section content
+        if (sectionContent.includes(query) || sectionHasMatch) {
             section.style.display = '';
         } else {
             section.style.display = 'none';
+        }
+    });
+    
+    // Also search in sidebar content
+    const sidebarLinks = document.querySelectorAll('.contact-links a, .sidebar-menu a');
+    sidebarLinks.forEach(link => {
+        const linkContent = link.textContent.toLowerCase();
+        if (linkContent.includes(query)) {
+            link.classList.add('search-highlight');
+            hasResults = true;
+        } else {
+            link.classList.remove('search-highlight');
         }
     });
     
