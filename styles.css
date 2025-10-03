@@ -11,10 +11,17 @@ body {
     color: #ffffff;
     line-height: 1.6;
     overflow-x: hidden;
-    perspective: 1000px;
+    perspective: 2000px;
+    transform-style: preserve-3d;
 }
 
-/* 3D Particle Background */
+/* Enhanced 3D Container */
+html {
+    perspective: 1400px;
+    perspective-origin: center center;
+}
+
+/* Enhanced 3D Particle Background */
 body::before {
     content: '';
     position: fixed;
@@ -23,37 +30,93 @@ body::before {
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(2px 2px at 20px 30px, rgba(29, 185, 84, 0.3), transparent),
-        radial-gradient(2px 2px at 40px 70px, rgba(114, 137, 218, 0.2), transparent),
-        radial-gradient(1px 1px at 90px 40px, rgba(255, 107, 107, 0.3), transparent),
-        radial-gradient(1px 1px at 130px 80px, rgba(29, 185, 84, 0.2), transparent),
-        radial-gradient(2px 2px at 160px 30px, rgba(156, 136, 255, 0.3), transparent);
+        radial-gradient(3px 3px at 20px 30px, rgba(29, 185, 84, 0.4), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(114, 137, 218, 0.3), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 107, 107, 0.4), transparent),
+        radial-gradient(2px 2px at 130px 80px, rgba(29, 185, 84, 0.3), transparent),
+        radial-gradient(3px 3px at 160px 30px, rgba(156, 136, 255, 0.4), transparent),
+        radial-gradient(1px 1px at 200px 50px, rgba(255, 215, 107, 0.3), transparent);
     background-repeat: repeat;
-    background-size: 200px 100px;
-    animation: particleFloat 20s linear infinite;
+    background-size: 250px 120px;
+    animation: particleFloat3D 25s linear infinite;
     z-index: -1;
-    opacity: 0.6;
+    opacity: 0.7;
+    transform-style: preserve-3d;
 }
 
-@keyframes particleFloat {
-    0% { transform: translateY(0px) rotate(0deg); }
-    100% { transform: translateY(-100px) rotate(360deg); }
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        conic-gradient(from 0deg at 30% 20%, rgba(29, 185, 84, 0.1) 0deg, transparent 60deg),
+        conic-gradient(from 180deg at 70% 80%, rgba(114, 137, 218, 0.1) 0deg, transparent 60deg),
+        conic-gradient(from 90deg at 50% 50%, rgba(156, 136, 255, 0.05) 0deg, transparent 120deg);
+    animation: rotateGradient 30s linear infinite;
+    z-index: -1;
+    opacity: 0.5;
 }
 
-/* Top Navigation */
+@keyframes particleFloat3D {
+    0% { 
+        transform: translateY(0px) rotateX(0deg) rotateZ(0deg) translateZ(0px);
+        filter: hue-rotate(0deg);
+    }
+    25% { 
+        transform: translateY(-25px) rotateX(90deg) rotateZ(90deg) translateZ(10px);
+        filter: hue-rotate(90deg);
+    }
+    50% { 
+        transform: translateY(-50px) rotateX(180deg) rotateZ(180deg) translateZ(0px);
+        filter: hue-rotate(180deg);
+    }
+    75% { 
+        transform: translateY(-75px) rotateX(270deg) rotateZ(270deg) translateZ(-10px);
+        filter: hue-rotate(270deg);
+    }
+    100% { 
+        transform: translateY(-100px) rotateX(360deg) rotateZ(360deg) translateZ(0px);
+        filter: hue-rotate(360deg);
+    }
+}
+
+@keyframes rotateGradient {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(1); }
+    75% { transform: rotate(270deg) scale(0.9); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Enhanced Top Navigation with 3D Effects */
 .top-nav {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: 64px;
-    background-color: #000000;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(24, 24, 24, 0.9) 100%);
+    backdrop-filter: blur(20px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 32px;
     z-index: 1000;
-    border-bottom: 1px solid #282828;
+    border-bottom: 1px solid rgba(40, 40, 40, 0.8);
+    transform-style: preserve-3d;
+    animation: navFloat 6s ease-in-out infinite;
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(29, 185, 84, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+@keyframes navFloat {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    50% { transform: translateY(-2px) rotateX(1deg); }
 }
 
 .nav-left .logo {
@@ -580,10 +643,53 @@ body::before {
     box-sizing: border-box;
 }
 
-/* Hero Section */
+/* Enhanced Hero Section with 3D Effects */
 .hero-section {
     padding: 80px 0 60px;
     text-align: center;
+    position: relative;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(29, 185, 84, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(114, 137, 218, 0.15) 0%, transparent 50%);
+    animation: heroGlow 8s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes heroGlow {
+    0%, 100% { 
+        transform: rotate(0deg) translateZ(0px);
+        opacity: 0.5;
+    }
+    50% { 
+        transform: rotate(180deg) translateZ(20px);
+        opacity: 0.8;
+    }
+}
+
+.hero-content {
+    transform-style: preserve-3d;
+    animation: heroFloat 6s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+    0%, 100% { 
+        transform: translateY(0px) rotateX(0deg);
+    }
+    50% { 
+        transform: translateY(-10px) rotateX(2deg);
+    }
 }
 
 .hero-content h1 {
@@ -591,10 +697,42 @@ body::before {
     font-weight: 900;
     margin-bottom: 24px;
     line-height: 1;
+    transform-style: preserve-3d;
+    text-shadow: 
+        0 0 30px rgba(29, 185, 84, 0.3),
+        0 10px 20px rgba(0, 0, 0, 0.5);
+    animation: textGlow 4s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+    0%, 100% { 
+        text-shadow: 
+            0 0 30px rgba(29, 185, 84, 0.3),
+            0 10px 20px rgba(0, 0, 0, 0.5),
+            0 0 60px rgba(29, 185, 84, 0.1);
+    }
+    50% { 
+        text-shadow: 
+            0 0 40px rgba(29, 185, 84, 0.5),
+            0 15px 30px rgba(0, 0, 0, 0.7),
+            0 0 80px rgba(29, 185, 84, 0.2);
+    }
 }
 
 .highlight {
     color: #1db954;
+    background: linear-gradient(45deg, #1db954, #1ed760, #1db954);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease-in-out infinite;
+    position: relative;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 .hero-subtitle {
@@ -602,6 +740,16 @@ body::before {
     color: #b3b3b3;
     margin-bottom: 48px;
     font-weight: 400;
+    opacity: 0;
+    animation: fadeInUp 1s ease-out 0.5s forwards;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero-stats {
@@ -612,10 +760,63 @@ body::before {
     margin-top: 48px;
     flex-wrap: wrap;
     max-width: 100%;
+    transform-style: preserve-3d;
 }
 
 .stat {
     text-align: center;
+    position: relative;
+    transform: translateZ(20px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    padding: 20px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, transparent 100%);
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat:hover {
+    transform: translateZ(40px) translateY(-10px) rotateX(10deg) scale(1.05);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(29, 185, 84, 0.2);
+}
+
+.stat:hover::before {
+    opacity: 1;
+}
+
+.stat:nth-child(odd) {
+    animation: statFloat1 4s ease-in-out infinite;
+}
+
+.stat:nth-child(even) {
+    animation: statFloat2 4s ease-in-out infinite 2s;
+}
+
+@keyframes statFloat1 {
+    0%, 100% { transform: translateZ(20px) translateY(0px); }
+    50% { transform: translateZ(30px) translateY(-5px); }
+}
+
+@keyframes statFloat2 {
+    0%, 100% { transform: translateZ(20px) translateY(0px); }
+    50% { transform: translateZ(30px) translateY(5px); }
 }
 
 .stat-number {
@@ -624,6 +825,17 @@ body::before {
     font-weight: 900;
     color: #1db954;
     line-height: 1;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stat:hover .stat-number {
+    color: #1ed760;
+    text-shadow: 
+        0 0 20px rgba(29, 185, 84, 0.6),
+        0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
@@ -632,6 +844,13 @@ body::before {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 500;
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s ease;
+}
+
+.stat:hover .stat-label {
+    color: #ffffff;
 }
 
 /* Content Sections */
