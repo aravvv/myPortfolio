@@ -1080,11 +1080,13 @@ function disableAdminMode() {
 }
 
 function makeContentEditable() {
-    // Make text content editable
+    // Make ALL text content editable - comprehensive selection
     const editableElements = document.querySelectorAll(
         'h1, h2, h3, .hero-subtitle, .description, .project-description, ' +
         '.company, .duration, .education-school, .education-grade, ' +
-        '.stat-number, .stat-label, .cert-info h3'
+        '.stat-number, .stat-label, .cert-info h3, .skill-tag, ' +
+        '.skill-category h3, .section-header h2, .profile-info h4, ' +
+        '.profile-info p, .song-title, .song-artist'
     );
     
     editableElements.forEach(element => {
@@ -1160,19 +1162,53 @@ function saveChangesToLocalStorage() {
     // Save individual changes to localStorage as they're made
     const portfolioData = {
         timestamp: Date.now(),
-        content: {}
+        content: {},
+        structure: {
+            sections: [],
+            skillCategories: []
+        }
     };
     
     const editableElements = document.querySelectorAll('.admin-editable');
     editableElements.forEach((element, index) => {
-        portfolioData.content[`element_${index}`] = {
-            text: element.textContent,
+        const uniqueId = generateUniqueId(element);
+        portfolioData.content[uniqueId] = {
+            text: element.textContent.trim(),
             html: element.innerHTML,
-            selector: getElementSelector(element)
+            selector: getElementSelector(element),
+            tagName: element.tagName,
+            className: element.className,
+            parentSelector: getParentSelector(element),
+            index: index,
+            uniqueId: uniqueId
         };
     });
     
+    // Save section structure
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach((section, index) => {
+        portfolioData.structure.sections.push({
+            id: section.id,
+            index: index,
+            title: section.querySelector('h2')?.textContent || '',
+            exists: true
+        });
+    });
+    
+    // Save skill categories structure
+    const skillCategories = document.querySelectorAll('.skill-category');
+    skillCategories.forEach((category, index) => {
+        const categoryTitle = category.querySelector('h3')?.textContent || '';
+        const skills = Array.from(category.querySelectorAll('.skill-tag')).map(tag => tag.textContent.trim());
+        portfolioData.structure.skillCategories.push({
+            title: categoryTitle,
+            skills: skills,
+            index: index
+        });
+    });
+    
     localStorage.setItem('portfolioChanges', JSON.stringify(portfolioData));
+    console.log('Comprehensive data saved:', portfolioData);
 }
 
 async function saveAllChanges() {
@@ -1256,6 +1292,28 @@ async function saveAllChanges() {
         saveBtn.innerHTML = originalContent;
         saveBtn.disabled = false;
     }
+}
+
+function generateUniqueId(element) {
+    // Generate a unique ID based on element characteristics
+    const tagName = element.tagName.toLowerCase();
+    const text = element.textContent.trim().substring(0, 20).replace(/\s+/g, '_');
+    const className = element.className.replace(/\s+/g, '_');
+    const parentClass = element.parentElement?.className.replace(/\s+/g, '_') || '';
+    
+    return `${tagName}_${text}_${className}_${parentClass}`.replace(/[^a-zA-Z0-9_]/g, '');
+}
+
+function getParentSelector(element) {
+    if (!element.parentElement) return '';
+    
+    let selector = element.parentElement.tagName.toLowerCase();
+    if (element.parentElement.id) selector += `#${element.parentElement.id}`;
+    if (element.parentElement.className) {
+        const classes = element.parentElement.className.split(' ').filter(c => c.trim());
+        if (classes.length > 0) selector += `.${classes.join('.')}`;
+    }
+    return selector;
 }
 
 function getElementSelector(element) {
