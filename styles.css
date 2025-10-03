@@ -171,7 +171,7 @@ body::before {
     background: rgba(29, 185, 84, 0.3);
 }
 
-/* Music Player */
+/* Music Player - Fixed at Bottom (Spotify Style) */
 .music-player {
     position: fixed;
     bottom: 0;
@@ -432,22 +432,18 @@ body::before {
     }
 }
 
-/* Adjust main content to account for music player */
+/* Main Container */
 .main-container {
+    display: flex;
+    margin-top: 64px;
     margin-bottom: 90px;
+    min-height: calc(100vh - 64px);
 }
 
 @media (max-width: 768px) {
     .main-container {
         margin-bottom: 80px;
     }
-}
-
-/* Main Container */
-.main-container {
-    display: flex;
-    margin-top: 64px;
-    min-height: calc(100vh - 64px);
 }
 
 /* Sidebar */
