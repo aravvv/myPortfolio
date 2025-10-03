@@ -288,6 +288,7 @@ function initializeSearch() {
 function performSearch(query) {
     const sections = document.querySelectorAll('.content-section');
     let hasResults = false;
+    let firstMatch = null;
     
     // Enhanced search that includes partial matches and multiple keywords
     const searchTerms = query.split(' ').filter(term => term.length > 0);
@@ -330,7 +331,11 @@ function performSearch(query) {
                 'ocr': ['optical character recognition'],
                 'bot': ['telegram bot', 'chatbot'],
                 'audio': ['music', 'sound', 'midi', 'daw'],
-                'iot': ['internet of things', 'raspberry pi', 'arduino']
+                'iot': ['internet of things', 'raspberry pi', 'arduino'],
+                'n8n': ['automation', 'workflow'],
+                'selenium': ['web automation', 'testing'],
+                'tableau': ['data visualization', 'analytics'],
+                'powerbi': ['power bi', 'microsoft', 'business intelligence']
             };
             
             // Check synonyms
@@ -348,29 +353,41 @@ function performSearch(query) {
             }
             
             if (cardMatches) {
+                // Always show the element
                 card.style.display = '';
                 card.classList.add('search-highlight');
                 sectionHasMatch = true;
                 hasResults = true;
                 
-                // If it's a skill category, show all skills in that category
+                // Store first match for auto-scroll
+                if (!firstMatch) {
+                    firstMatch = card;
+                }
+                
+                // If it's a skill category, show all skills in that category and scroll to it in carousel
                 if (card.classList.contains('skill-category')) {
                     const skillTags = card.querySelectorAll('.skill-tag');
                     skillTags.forEach(tag => {
                         tag.style.display = '';
                     });
+                    
+                    // Auto-scroll carousel to show this skill category
+                    scrollToSkillCategory(card);
                 }
             } else {
-                card.style.display = 'none';
+                // Don't hide, just remove highlight
                 card.classList.remove('search-highlight');
             }
         });
         
-        // Show section if it has matches or if the query matches section content
+        // Always show sections, never hide them
+        section.style.display = '';
+        
+        // Add section highlight if it matches
         if (sectionContent.includes(query) || sectionHasMatch) {
-            section.style.display = '';
+            section.classList.add('search-highlight-section');
         } else {
-            section.style.display = 'none';
+            section.classList.remove('search-highlight-section');
         }
     });
     
@@ -381,12 +398,43 @@ function performSearch(query) {
         if (linkContent.includes(query)) {
             link.classList.add('search-highlight');
             hasResults = true;
+            if (!firstMatch) {
+                firstMatch = link;
+            }
         } else {
             link.classList.remove('search-highlight');
         }
     });
     
+    // Auto-scroll to first match
+    if (firstMatch) {
+        setTimeout(() => {
+            firstMatch.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center',
+                inline: 'center'
+            });
+        }, 100);
+    }
+    
     showSearchResults(hasResults, query);
+}
+
+// Function to scroll carousel to specific skill category
+function scrollToSkillCategory(skillCategory) {
+    const skillsCarousel = document.getElementById('skillsCarousel');
+    if (!skillsCarousel || !skillCategory) return;
+    
+    const containerRect = skillsCarousel.getBoundingClientRect();
+    const elementRect = skillCategory.getBoundingClientRect();
+    
+    // Calculate scroll position to center the element
+    const scrollLeft = skillsCarousel.scrollLeft + (elementRect.left - containerRect.left) - (containerRect.width / 2) + (elementRect.width / 2);
+    
+    skillsCarousel.scrollTo({
+        left: Math.max(0, scrollLeft),
+        behavior: 'smooth'
+    });
 }
 
 function clearSearch() {
@@ -639,13 +687,127 @@ function initializeSkillsCarousel() {
     setTimeout(updateButtonStates, 100);
 }
 
+// Make skill categories clickable with animations
+function initializeClickableSkillCategories() {
+    const skillCategories = document.querySelectorAll('.skill-category');
+    
+    skillCategories.forEach(category => {
+        category.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove expanded class from all other categories
+            skillCategories.forEach(cat => {
+                if (cat !== this) {
+                    cat.classList.remove('expanded');
+                }
+            });
+            
+            // Toggle expanded class on clicked category
+            this.classList.toggle('expanded');
+            
+            // If expanding, scroll to center it in view
+            if (this.classList.contains('expanded')) {
+                setTimeout(() => {
+                    this.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'center'
+                    });
+                }, 100);
+                
+                // Add skill icons if not already present
+                addSkillIcons(this);
+            }
+        });
+    });
+    
+    // Close expanded categories when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.skill-category')) {
+            skillCategories.forEach(cat => {
+                cat.classList.remove('expanded');
+            });
+        }
+    });
+}
+
+// Add skill icons to expanded categories
+function addSkillIcons(category) {
+    const skillTags = category.querySelectorAll('.skill-tag');
+    
+    // Skill icon mapping
+    const skillIcons = {
+        'Python': 'fab fa-python',
+        'C': 'fas fa-code',
+        'Java (Basics)': 'fab fa-java',
+        'HTML': 'fab fa-html5',
+        'CSS': 'fab fa-css3-alt',
+        'Amazon Web Services (AWS)': 'fab fa-aws',
+        'SQL': 'fas fa-database',
+        'MongoDB': 'fas fa-leaf',
+        'Large Language Models (LLMs)': 'fas fa-brain',
+        'Agentic AI': 'fas fa-robot',
+        'OpenCV': 'fas fa-eye',
+        'Flask': 'fas fa-flask',
+        'Pandas': 'fas fa-table',
+        'NumPy': 'fas fa-calculator',
+        'TensorFlow': 'fas fa-network-wired',
+        'Scikit-learn': 'fas fa-chart-line',
+        'LangChain': 'fas fa-link',
+        'n8n': 'fas fa-project-diagram',
+        'Selenium': 'fas fa-spider',
+        'Web Scraping': 'fas fa-globe',
+        'API Development & Integration': 'fas fa-plug',
+        'Website Automation': 'fas fa-cogs',
+        'AI Chatbot Development': 'fas fa-comments',
+        'Arduino': 'fas fa-microchip',
+        'Raspberry Pi': 'fas fa-raspberry-pi',
+        'Robotics': 'fas fa-robot',
+        'Git': 'fab fa-git-alt',
+        'GitHub': 'fab fa-github',
+        'Microsoft Excel': 'fas fa-file-excel',
+        'Power BI': 'fas fa-chart-bar',
+        'Tableau': 'fas fa-chart-area',
+        'Communication': 'fas fa-comments',
+        'Leadership and Team Management': 'fas fa-users',
+        'Presentation Design (Microsoft PowerPoint)': 'fas fa-presentation',
+        'Canva': 'fas fa-palette',
+        'Video Editing': 'fas fa-video',
+        'Digital Audio Workstation (Cakewalk by BandLab)': 'fas fa-music',
+        'MIDI Programming': 'fas fa-piano',
+        'Audio Interfaces & Monitoring': 'fas fa-headphones',
+        'Guitar': 'fas fa-guitar',
+        'Piano': 'fas fa-piano'
+    };
+    
+    skillTags.forEach(tag => {
+        const skillName = tag.textContent.trim();
+        const iconClass = skillIcons[skillName];
+        
+        if (iconClass && !tag.querySelector('i')) {
+            const icon = document.createElement('i');
+            icon.className = iconClass + ' skill-icon';
+            
+            // Wrap content in skill-tag-with-icon
+            const textNode = tag.childNodes[0];
+            tag.innerHTML = '';
+            tag.classList.add('skill-tag-with-icon');
+            tag.appendChild(icon);
+            tag.appendChild(document.createTextNode(skillName));
+        }
+    });
+}
+
 // Additional interactive features
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize skills carousel
     initializeSkillsCarousel();
     
+    // Initialize clickable skill categories
+    initializeClickableSkillCategories();
+    
     // Add click effects to cards
-    const cards = document.querySelectorAll('.skill-category, .experience-card, .project-card, .certification-card');
+    const cards = document.querySelectorAll('.experience-card, .project-card, .certification-card');
     
     cards.forEach(card => {
         card.addEventListener('click', function() {
