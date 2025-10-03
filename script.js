@@ -921,7 +921,7 @@ document.head.appendChild(styleSheet);
 
 // Admin Mode functionality
 let isAdminMode = false;
-let adminPassword = 'portfolio2024'; // Client-side only - NOT secure!
+let adminToken = null;
 
 function initializeAdminMode() {
     const adminBtn = document.getElementById('adminBtn');
@@ -930,7 +930,9 @@ function initializeAdminMode() {
     adminBtn.addEventListener('click', handleAdminClick);
     
     // Check if admin mode is already active (stored in localStorage)
-    if (localStorage.getItem('adminMode') === 'true') {
+    const storedToken = localStorage.getItem('adminToken');
+    if (storedToken && localStorage.getItem('adminMode') === 'true') {
+        adminToken = storedToken;
         enableAdminMode();
     }
 }
@@ -985,20 +987,54 @@ function showPasswordPrompt() {
     });
 }
 
-function verifyAdminPassword() {
+async function verifyAdminPassword() {
     const passwordInput = document.getElementById('adminPasswordInput');
     const errorDiv = document.getElementById('adminError');
+    const submitBtn = document.querySelector('.admin-submit-btn');
     const enteredPassword = passwordInput.value;
     
-    // NOTE: This is client-side verification only - NOT secure for production!
-    // For production, this should be sent to a backend API route
-    if (enteredPassword === adminPassword) {
-        enableAdminMode();
-        document.querySelector('.admin-modal').remove();
-    } else {
+    if (!enteredPassword) {
+        errorDiv.textContent = 'Please enter a password';
         errorDiv.style.display = 'block';
-        passwordInput.value = '';
-        passwordInput.focus();
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+    submitBtn.disabled = true;
+    errorDiv.style.display = 'none';
+    
+    try {
+        // Backend API call for secure authentication
+        const response = await fetch('/api/verify-admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: enteredPassword })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            // Store the secure token
+            adminToken = result.token;
+            localStorage.setItem('adminToken', adminToken);
+            
+            enableAdminMode();
+            document.querySelector('.admin-modal').remove();
+        } else {
+            errorDiv.textContent = result.message || 'Authentication failed';
+            errorDiv.style.display = 'block';
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+    } catch (error) {
+        console.error('Authentication error:', error);
+        errorDiv.textContent = 'Connection error. Please try again.';
+        errorDiv.style.display = 'block';
+    } finally {
+        // Restore button state
+        submitBtn.innerHTML = 'Access';
+        submitBtn.disabled = false;
     }
 }
 
@@ -1136,19 +1172,87 @@ function saveChangesToLocalStorage() {
     localStorage.setItem('portfolioChanges', JSON.stringify(portfolioData));
 }
 
-function saveAllChanges() {
-    saveChangesToLocalStorage();
+async function saveAllChanges() {
+    const saveBtn = document.querySelector('.admin-save-btn');
+    const originalContent = saveBtn.innerHTML;
     
-    // Show success message
-    const successMsg = document.createElement('div');
-    successMsg.className = 'admin-success-message';
-    successMsg.innerHTML = '<i class="fas fa-check"></i> Changes saved successfully!';
+    if (!adminToken) {
+        alert('Admin session expired. Please log in again.');
+        disableAdminMode();
+        return;
+    }
     
-    document.body.appendChild(successMsg);
+    // Show loading state
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    saveBtn.disabled = true;
     
-    setTimeout(() => {
-        successMsg.remove();
-    }, 3000);
+    // Collect all portfolio data
+    const portfolioData = {
+        timestamp: Date.now(),
+        content: {}
+    };
+    
+    const editableElements = document.querySelectorAll('.admin-editable');
+    editableElements.forEach((element, index) => {
+        portfolioData.content[`element_${index}`] = {
+            text: element.textContent,
+            html: element.innerHTML,
+            selector: getElementSelector(element),
+            tagName: element.tagName
+        };
+    });
+    
+    try {
+        // Save to backend with secure authentication
+        const response = await fetch('/api/save-portfolio', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            },
+            body: JSON.stringify({ portfolioData })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            // Also save locally as backup
+            localStorage.setItem('portfolioChanges', JSON.stringify(portfolioData));
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'admin-success-message';
+            successMsg.innerHTML = '<i class="fas fa-check"></i> Changes saved to server successfully!';
+            
+            document.body.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+        } else {
+            throw new Error(result.message || 'Save failed');
+        }
+    } catch (error) {
+        console.error('Save error:', error);
+        
+        // Fallback to localStorage save
+        localStorage.setItem('portfolioChanges', JSON.stringify(portfolioData));
+        
+        // Show warning message
+        const warningMsg = document.createElement('div');
+        warningMsg.className = 'admin-warning-message';
+        warningMsg.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Saved locally only - Server connection failed';
+        
+        document.body.appendChild(warningMsg);
+        
+        setTimeout(() => {
+            warningMsg.remove();
+        }, 4000);
+    } finally {
+        // Restore button state
+        saveBtn.innerHTML = originalContent;
+        saveBtn.disabled = false;
+    }
 }
 
 function getElementSelector(element) {
