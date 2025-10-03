@@ -508,7 +508,6 @@ body {
     margin-left: 280px;
     padding: 24px 32px;
     background: linear-gradient(180deg, #1db954 0%, #121212 300px);
-    width: calc(100vw - 280px - 64px);
     overflow-x: hidden;
     position: relative;
     box-sizing: border-box;
