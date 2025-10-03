@@ -1,8 +1,10 @@
 # Arav Gupta - Professional Portfolio
 
+🌐 **LIVE PORTFOLIO**: **[https://aravportfolio.vercel.app/](https://aravportfolio.vercel.app/)**
+
 A modern, interactive portfolio website with admin functionality built with HTML, CSS, JavaScript, and Vercel serverless functions.
 
-## Features
+## ✨ Features
 
 - 🎵 **Spotify-inspired Design** - Modern, clean interface with music player
 - 🔍 **Enhanced Search** - Smart search with highlighting and auto-scroll
@@ -11,16 +13,9 @@ A modern, interactive portfolio website with admin functionality built with HTML
 - 📱 **Fully Responsive** - Works perfectly on all devices
 - ⚡ **Fast & Modern** - Optimized performance with smooth animations
 
-## Admin System
+## 🔐 Admin System
 
 The portfolio includes a comprehensive admin system for content management:
-
-### Features:
-- 🔐 **Secure Authentication** - Backend-verified password protection
-- ✏️ **Inline Editing** - Click any text to edit directly
-- 💾 **Auto-save** - Changes are saved both locally and to the server
-- 🗑️ **Section Management** - Delete sections with confirmation
-- 📊 **Real-time Updates** - See changes immediately
 
 ### Admin Access:
 1. Click the gear icon (⚙️) in the top-right corner
@@ -28,129 +23,14 @@ The portfolio includes a comprehensive admin system for content management:
 3. Start editing content directly
 4. Use the "Save Changes" button to persist modifications
 
-## Deployment on Vercel
+### Admin Features:
+- 🔐 **Secure Authentication** - Backend-verified password protection
+- ✏️ **Inline Editing** - Click any text to edit directly
+- 💾 **Auto-save** - Changes are saved both locally and to the server
+- 🗑️ **Section Management** - Delete sections with confirmation
+- 📊 **Real-time Updates** - See changes immediately
 
-### Prerequisites
-- [Vercel CLI](https://vercel.com/cli) installed
-- [Git](https://git-scm.com/) installed
-- Vercel account
-
-### Quick Deploy
-1. **Clone & Setup:**
-   ```bash
-   git clone <your-repo-url>
-   cd myPortfolio
-   ```
-
-2. **Install Vercel CLI:**
-   ```bash
-   npm i -g vercel
-   ```
-
-3. **Login to Vercel:**
-   ```bash
-   vercel login
-   ```
-
-4. **Deploy:**
-   ```bash
-   vercel
-   ```
-
-5. **Set Environment Variables:**
-   ```bash
-   vercel env add ADMIN_PASSWORD
-   ```
-   Enter your secure admin password when prompted.
-
-6. **Redeploy with Environment Variables:**
-   ```bash
-   vercel --prod
-   ```
-
-### Environment Variables
-
-Set these in your Vercel dashboard or via CLI:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `ADMIN_PASSWORD` | Secure password for admin access | `mySecurePassword123!` |
-
-### Manual Deployment via Vercel Dashboard
-
-1. Go to [vercel.com](https://vercel.com) and sign in
-2. Click "New Project"
-3. Import your Git repository
-4. Configure environment variables:
-   - `ADMIN_PASSWORD`: Your secure admin password
-5. Deploy!
-
-## API Endpoints
-
-### `POST /api/verify-admin`
-Authenticates admin users and returns a session token.
-
-**Request:**
-```json
-{
-  "password": "your-admin-password"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "token": "base64-encoded-session-token",
-  "message": "Authentication successful"
-}
-```
-
-### `POST /api/save-portfolio`
-Saves portfolio changes securely.
-
-**Headers:**
-```
-Authorization: Bearer <session-token>
-Content-Type: application/json
-```
-
-**Request:**
-```json
-{
-  "portfolioData": {
-    "timestamp": 1640995200000,
-    "content": {
-      "element_0": {
-        "text": "Updated content",
-        "html": "<h1>Updated content</h1>",
-        "selector": "h1.hero-title"
-      }
-    }
-  }
-}
-```
-
-## Local Development
-
-1. **Start a local server:**
-   ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js
-   npx serve .
-   
-   # Using PHP
-   php -S localhost:8000
-   ```
-
-2. **For API testing with Vercel:**
-   ```bash
-   vercel dev
-   ```
-
-## Security Features
+## 🔒 Security Features
 
 - 🔐 **Environment Variable Protection** - Admin password stored securely
 - 🛡️ **Token-based Authentication** - Secure session management
@@ -217,5 +97,7 @@ This project is open source and available under the [MIT License](LICENSE).
 - **GitHub**: [aravvv](https://github.com/aravvv)
 
 ---
+
+**STATIC PAGE LINK**: [https://aravvv.github.io/myPortfolio](https://aravvv.github.io/myPortfolio)
 
 **Note**: Remember to keep your admin password secure and never commit it to version control!
