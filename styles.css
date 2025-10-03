@@ -1163,6 +1163,293 @@ body {
     }
 }
 
+/* Listen and Read Callout */
+.listen-read-callout {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    color: #000000;
+    padding: 12px 20px;
+    border-radius: 25px;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 20px rgba(29, 185, 84, 0.4);
+    animation: slideDown 0.5s ease-out;
+}
+
+.callout-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.callout-close {
+    background: none;
+    border: none;
+    color: #000000;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.callout-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Contact Section - Spotify Album Style */
+.contact-section {
+    background: linear-gradient(180deg, #1f3a1c 0%, #121212 300px);
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 64px;
+}
+
+.contact-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 32px;
+    min-height: 340px;
+}
+
+.contact-cover {
+    width: 232px;
+    height: 232px;
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.contact-avatar {
+    font-size: 120px;
+    color: #000000;
+    opacity: 0.8;
+}
+
+.contact-info {
+    flex: 1;
+    padding-bottom: 20px;
+}
+
+.contact-type {
+    font-size: 14px;
+    font-weight: 400;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contact-name {
+    font-size: 96px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
+.contact-subtitle {
+    font-size: 16px;
+    color: #b3b3b3;
+    margin-bottom: 16px;
+    font-weight: 400;
+}
+
+.contact-stats {
+    font-size: 14px;
+    color: #b3b3b3;
+    font-weight: 400;
+}
+
+.contact-content {
+    padding: 0 32px 32px;
+}
+
+.contact-actions {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.contact-play-btn {
+    width: 56px;
+    height: 56px;
+    background: #1db954;
+    border: none;
+    border-radius: 50%;
+    color: #000000;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.contact-play-btn:hover {
+    background: #1ed760;
+    transform: scale(1.04);
+}
+
+.contact-follow-btn {
+    border: 1px solid #727272;
+    background: transparent;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contact-follow-btn:hover {
+    border-color: #ffffff;
+    transform: scale(1.04);
+}
+
+.contact-more-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.3s ease;
+}
+
+.contact-more-btn:hover {
+    color: #ffffff;
+}
+
+.contact-tracklist {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.contact-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.contact-item-number {
+    width: 16px;
+    text-align: right;
+    color: #b3b3b3;
+    font-size: 16px;
+    font-weight: 400;
+    margin-right: 16px;
+}
+
+.contact-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.contact-item-name {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.contact-item-detail {
+    color: #b3b3b3;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.contact-item-icon {
+    color: #b3b3b3;
+    font-size: 20px;
+    margin-left: 16px;
+    transition: color 0.3s ease;
+}
+
+.contact-item:hover .contact-item-icon {
+    color: #1db954;
+}
+
+.contact-item:hover .contact-item-number {
+    color: #ffffff;
+}
+
+/* Contact Section Responsive */
+@media (max-width: 768px) {
+    .contact-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 24px;
+        min-height: auto;
+    }
+    
+    .contact-cover {
+        width: 192px;
+        height: 192px;
+        margin-bottom: 24px;
+    }
+    
+    .contact-avatar {
+        font-size: 96px;
+    }
+    
+    .contact-name {
+        font-size: 48px;
+    }
+    
+    .contact-content {
+        padding: 0 24px 24px;
+    }
+    
+    .contact-actions {
+        justify-content: center;
+    }
+    
+    .listen-read-callout {
+        left: 20px;
+        right: 20px;
+        transform: none;
+    }
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 12px;

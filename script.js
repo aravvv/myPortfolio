@@ -13,7 +13,37 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeParallaxEffect();
     initializeMusicPlayer();
     initializeAdminMode();
+    initializeCallout();
 });
+
+// Callout functionality
+function initializeCallout() {
+    // Show callout automatically after page loads
+    setTimeout(() => {
+        const callout = document.getElementById('listenReadCallout');
+        if (callout) {
+            callout.style.opacity = '1';
+        }
+    }, 1000);
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        const callout = document.getElementById('listenReadCallout');
+        if (callout && callout.style.display !== 'none') {
+            closeCallout();
+        }
+    }, 6000);
+}
+
+function closeCallout() {
+    const callout = document.getElementById('listenReadCallout');
+    if (callout) {
+        callout.style.animation = 'slideUp 0.3s ease-out forwards';
+        setTimeout(() => {
+            callout.style.display = 'none';
+        }, 300);
+    }
+}
 
 // Music Player Data - Curated playlist with free music sources
 const playlist = [
