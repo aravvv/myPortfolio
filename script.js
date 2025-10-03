@@ -1507,7 +1507,7 @@ function loadSavedChanges() {
                     const allElements = document.querySelectorAll(
                         'h1, h2, h3, .hero-subtitle, .description, .project-description, ' +
                         '.company, .duration, .education-school, .education-grade, ' +
-                        '.stat-number, .stat-label, .cert-info h3'
+                        '.stat-number, .stat-label, .cert-info h3, .skill-tag, .skill-category h3'
                     );
                     
                     // Find element with similar original content
@@ -1532,10 +1532,96 @@ function loadSavedChanges() {
                     element.textContent = elementData.text;
                 }
             });
+            
+            // Handle new skill categories and skills that were added
+            loadNewSkillsAndCategories(portfolioData);
         }
     } catch (error) {
         console.error('Error loading saved changes:', error);
     }
+}
+
+// Load new skills and categories that were added in admin mode
+function loadNewSkillsAndCategories(portfolioData) {
+    const skillsCarousel = document.getElementById('skillsCarousel');
+    if (!skillsCarousel || !portfolioData.content) return;
+    
+    const savedElements = Object.values(portfolioData.content);
+    
+    // Find saved skill categories that don't exist in current DOM
+    const existingCategories = Array.from(skillsCarousel.querySelectorAll('.skill-category h3'))
+        .map(h3 => h3.textContent.trim());
+    
+    const savedCategories = savedElements
+        .filter(item => item.tagName === 'H3' && item.selector && item.selector.includes('skill-category'))
+        .map(item => item.text.trim());
+    
+    // Add missing categories
+    savedCategories.forEach(categoryName => {
+        if (!existingCategories.includes(categoryName)) {
+            const relatedSkills = savedElements
+                .filter(item => item.tagName === 'SPAN' && 
+                        item.selector && 
+                        item.selector.includes('skill-tag'))
+                .map(item => item.text.trim());
+            
+            // Create new category with related skills
+            createSkillCategoryFromSaved(categoryName, relatedSkills);
+        }
+    });
+    
+    // Handle individual skills that were added to existing categories
+    const existingSkillCategories = skillsCarousel.querySelectorAll('.skill-category');
+    existingSkillCategories.forEach(category => {
+        const categoryTitle = category.querySelector('h3').textContent.trim();
+        const existingSkills = Array.from(category.querySelectorAll('.skill-tag'))
+            .map(tag => tag.textContent.trim());
+        
+        // Find saved skills for this category
+        const savedSkills = savedElements
+            .filter(item => item.tagName === 'SPAN' && 
+                    item.text && 
+                    !existingSkills.includes(item.text.trim()))
+            .map(item => item.text.trim());
+        
+        // Add missing skills to this category
+        savedSkills.forEach(skillName => {
+            if (skillName && !existingSkills.includes(skillName)) {
+                addSkillToCategory(category, skillName);
+            }
+        });
+    });
+}
+
+// Create skill category from saved data
+function createSkillCategoryFromSaved(categoryName, skills) {
+    const skillsGrid = document.getElementById('skillsCarousel');
+    if (!skillsGrid) return;
+    
+    const newCategory = document.createElement('div');
+    newCategory.className = 'skill-category';
+    newCategory.innerHTML = `
+        <h3>${categoryName}</h3>
+        <div class="skill-tags">
+            ${skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+        </div>
+    `;
+    
+    skillsGrid.appendChild(newCategory);
+    console.log('Created new skill category from saved data:', categoryName);
+}
+
+// Add skill to existing category
+function addSkillToCategory(category, skillName) {
+    const skillTagsContainer = category.querySelector('.skill-tags');
+    if (!skillTagsContainer) return;
+    
+    const newSkillTag = document.createElement('span');
+    newSkillTag.className = 'skill-tag';
+    newSkillTag.textContent = skillName;
+    
+    skillTagsContainer.appendChild(newSkillTag);
+    console.log('Added skill to category:', skillName);
 }
 
 // Add functionality to add new skills
