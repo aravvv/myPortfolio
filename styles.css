@@ -7,10 +7,45 @@
 
 body {
     font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #000000;
+    background: linear-gradient(135deg, #000000 0%, #1a1a2e 25%, #16213e 50%, #0f0f0f 75%, #000000 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
     color: #ffffff;
     line-height: 1.6;
     overflow-x: hidden;
+    perspective: 1000px;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 3D Particle Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(29, 185, 84, 0.3), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(114, 137, 218, 0.2), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255, 107, 107, 0.3), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(29, 185, 84, 0.2), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(156, 136, 255, 0.3), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: particleFloat 20s linear infinite;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+@keyframes particleFloat {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-100px) rotate(360deg); }
 }
 
 /* Top Navigation */
@@ -858,33 +893,87 @@ body {
 
 .experience-card {
     display: flex;
-    background-color: #181818;
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
     padding: 24px;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     align-items: flex-start;
     gap: 20px;
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+}
+
+.experience-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, transparent 50%, rgba(114, 137, 218, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    border-radius: 16px;
+}
+
+.experience-card:hover::before {
+    opacity: 1;
 }
 
 .experience-card:hover {
-    background-color: #282828;
-    transform: translateY(-4px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    transform: translateY(-8px) rotateX(5deg) rotateY(5deg) scale(1.02);
+    border-color: rgba(29, 185, 84, 0.3);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(29, 185, 84, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .experience-image {
     width: 64px;
     height: 64px;
-    background-color: #1db954;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 20px rgba(29, 185, 84, 0.3);
+}
+
+.experience-image::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    transition: transform 0.6s ease;
+}
+
+.experience-card:hover .experience-image::before {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
 }
 
 .experience-image i {
     font-size: 24px;
     color: #000000;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+.experience-card:hover .experience-image i {
+    transform: scale(1.1) rotateY(360deg);
 }
 
 .experience-info h3 {
@@ -919,31 +1008,91 @@ body {
 }
 
 .project-card {
-    background-color: #181818;
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
     padding: 24px;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, transparent 50%, rgba(156, 136, 255, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    border-radius: 16px;
+}
+
+.project-card:hover::before {
+    opacity: 1;
 }
 
 .project-card:hover {
-    background-color: #282828;
-    transform: translateY(-4px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    transform: translateY(-12px) rotateX(10deg) rotateY(-5deg) scale(1.03);
+    border-color: rgba(29, 185, 84, 0.4);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(29, 185, 84, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .project-image {
     width: 80px;
     height: 80px;
-    background-color: #1db954;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #1db954 0%, #1ed760 100%);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(29, 185, 84, 0.4);
+}
+
+.project-image::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    transition: transform 0.8s ease;
+}
+
+.project-card:hover .project-image::before {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
 }
 
 .project-image i {
     font-size: 32px;
     color: #000000;
+    position: relative;
+    z-index: 1;
+    transition: all 0.4s ease;
+}
+
+.project-card:hover .project-image i {
+    transform: scale(1.2) rotateZ(360deg);
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.project-card:hover .project-image {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 15px 35px rgba(29, 185, 84, 0.6);
 }
 
 .project-info h3 {
