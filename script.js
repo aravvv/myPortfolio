@@ -18,21 +18,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Callout functionality
 function initializeCallout() {
-    // Show callout automatically after page loads
-    setTimeout(() => {
-        const callout = document.getElementById('listenReadCallout');
-        if (callout) {
-            callout.style.opacity = '1';
-        }
-    }, 1000);
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-        const callout = document.getElementById('listenReadCallout');
-        if (callout && callout.style.display !== 'none') {
-            closeCallout();
-        }
-    }, 6000);
+    const callout = document.getElementById('listenReadCallout');
+    if (callout) {
+        // Make sure it's visible immediately
+        callout.style.display = 'flex';
+        callout.style.opacity = '1';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            if (callout && callout.style.display !== 'none') {
+                closeCallout();
+            }
+        }, 5000);
+    }
 }
 
 function closeCallout() {

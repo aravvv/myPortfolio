@@ -1181,6 +1181,7 @@ body {
     font-size: 14px;
     box-shadow: 0 4px 20px rgba(29, 185, 84, 0.4);
     animation: slideDown 0.5s ease-out;
+    opacity: 1;
 }
 
 .callout-content {
@@ -1212,6 +1213,17 @@ body {
     to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
     }
 }
 
