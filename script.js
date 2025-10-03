@@ -1,6 +1,9 @@
 // Spotify-inspired Portfolio JavaScript with Music Player
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Load saved changes first
+    loadSavedChanges();
+    
     // Initialize all functionality
     initializeSearch();
     initializeSmoothScrolling();
@@ -1473,7 +1476,267 @@ const adminStyles = `
     }
 `;
 
+// Load saved changes function
+function loadSavedChanges() {
+    const savedData = localStorage.getItem('portfolioChanges');
+    if (!savedData) return;
+    
+    try {
+        const portfolioData = JSON.parse(savedData);
+        console.log('Loading saved changes:', portfolioData);
+        
+        // Apply saved changes to elements
+        if (portfolioData.content) {
+            Object.keys(portfolioData.content).forEach(key => {
+                const elementData = portfolioData.content[key];
+                
+                // Find element by selector or fallback methods
+                let element = null;
+                
+                // Try to find by selector first
+                if (elementData.selector) {
+                    try {
+                        element = document.querySelector(elementData.selector);
+                    } catch (e) {
+                        // Selector might be invalid, continue with other methods
+                    }
+                }
+                
+                // If not found by selector, try finding by content match
+                if (!element && elementData.text) {
+                    const allElements = document.querySelectorAll(
+                        'h1, h2, h3, .hero-subtitle, .description, .project-description, ' +
+                        '.company, .duration, .education-school, .education-grade, ' +
+                        '.stat-number, .stat-label, .cert-info h3'
+                    );
+                    
+                    // Find element with similar original content
+                    for (let el of allElements) {
+                        const originalText = el.textContent.trim();
+                        const savedText = elementData.text.trim();
+                        
+                        // Match by tag name and similar content (allowing for some differences)
+                        if (el.tagName === elementData.tagName && 
+                            (originalText === savedText || 
+                             originalText.includes(savedText.substring(0, 10)) ||
+                             savedText.includes(originalText.substring(0, 10)))) {
+                            element = el;
+                            break;
+                        }
+                    }
+                }
+                
+                // Apply changes if element found
+                if (element && elementData.text !== element.textContent) {
+                    console.log('Updating element:', element, 'with text:', elementData.text);
+                    element.textContent = elementData.text;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading saved changes:', error);
+    }
+}
+
+// Add functionality to add new skills
+function addNewSkill(categoryElement) {
+    const skillTagsContainer = categoryElement.querySelector('.skill-tags');
+    if (!skillTagsContainer) return;
+    
+    const newSkillName = prompt('Enter new skill name:');
+    if (!newSkillName || !newSkillName.trim()) return;
+    
+    const newSkillTag = document.createElement('span');
+    newSkillTag.className = 'skill-tag';
+    newSkillTag.textContent = newSkillName.trim();
+    newSkillTag.contentEditable = true;
+    newSkillTag.classList.add('admin-editable');
+    newSkillTag.addEventListener('blur', saveChangesToLocalStorage);
+    
+    skillTagsContainer.appendChild(newSkillTag);
+    saveChangesToLocalStorage();
+    
+    // Show success message
+    const successMsg = document.createElement('div');
+    successMsg.className = 'admin-success-message';
+    successMsg.innerHTML = '<i class="fas fa-plus"></i> New skill added!';
+    successMsg.style.animation = 'fadeInOut 2s ease-in-out';
+    
+    document.body.appendChild(successMsg);
+    setTimeout(() => successMsg.remove(), 2000);
+}
+
+// Enhanced section management with add new skill functionality
+function addSectionManagementButtons() {
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => {
+        if (section.querySelector('.admin-section-btn')) return; // Already has buttons
+        
+        const sectionControls = document.createElement('div');
+        sectionControls.className = 'admin-section-controls';
+        
+        // Add skill button for skills section
+        if (section.id === 'skills') {
+            sectionControls.innerHTML = `
+                <button class="admin-section-btn admin-add-skill" onclick="showAddSkillModal()" title="Add New Skill Category">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="admin-section-btn admin-delete-section" onclick="deleteSection(this)" title="Delete Section">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+        } else {
+            sectionControls.innerHTML = `
+                <button class="admin-section-btn admin-delete-section" onclick="deleteSection(this)" title="Delete Section">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+        }
+        
+        section.appendChild(sectionControls);
+    });
+    
+    // Add skill buttons to individual skill categories
+    const skillCategories = document.querySelectorAll('.skill-category');
+    skillCategories.forEach(category => {
+        if (category.querySelector('.admin-skill-btn')) return;
+        
+        const addSkillBtn = document.createElement('button');
+        addSkillBtn.className = 'admin-skill-btn';
+        addSkillBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        addSkillBtn.title = 'Add New Skill';
+        addSkillBtn.onclick = () => addNewSkill(category);
+        
+        category.appendChild(addSkillBtn);
+    });
+}
+
+// Show modal to add new skill category
+function showAddSkillModal() {
+    const modal = document.createElement('div');
+    modal.className = 'admin-modal';
+    modal.innerHTML = `
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3>Add New Skill Category</h3>
+                <button class="close-modal" onclick="this.parentElement.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal-body">
+                <p>Category Name:</p>
+                <input type="text" id="newCategoryName" placeholder="e.g., New Technologies" 
+                       style="width: 100%; padding: 12px; margin: 8px 0; background: #282828; 
+                              border: 1px solid #404040; border-radius: 4px; color: #ffffff; outline: none;">
+                <p>Skills (comma separated):</p>
+                <textarea id="newCategorySkills" placeholder="e.g., React, Vue.js, Angular" 
+                         style="width: 100%; padding: 12px; margin: 8px 0; background: #282828; 
+                                border: 1px solid #404040; border-radius: 4px; color: #ffffff; outline: none; 
+                                height: 80px; resize: vertical;"></textarea>
+                <div class="admin-modal-actions">
+                    <button class="admin-cancel-btn" onclick="this.closest('.admin-modal').remove()">Cancel</button>
+                    <button class="admin-submit-btn" onclick="createNewSkillCategory()">Add Category</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    setTimeout(() => document.getElementById('newCategoryName').focus(), 100);
+}
+
+// Create new skill category
+function createNewSkillCategory() {
+    const categoryName = document.getElementById('newCategoryName').value.trim();
+    const skillsText = document.getElementById('newCategorySkills').value.trim();
+    
+    if (!categoryName) {
+        alert('Please enter a category name');
+        return;
+    }
+    
+    const skills = skillsText ? skillsText.split(',').map(s => s.trim()).filter(s => s) : [];
+    
+    const skillsGrid = document.getElementById('skillsCarousel');
+    const newCategory = document.createElement('div');
+    newCategory.className = 'skill-category';
+    newCategory.innerHTML = `
+        <h3 contenteditable="true" class="admin-editable">${categoryName}</h3>
+        <div class="skill-tags">
+            ${skills.map(skill => `<span class="skill-tag admin-editable" contenteditable="true">${skill}</span>`).join('')}
+        </div>
+    `;
+    
+    skillsGrid.appendChild(newCategory);
+    
+    // Add event listeners to new editable elements
+    const editableElements = newCategory.querySelectorAll('.admin-editable');
+    editableElements.forEach(element => {
+        element.addEventListener('blur', saveChangesToLocalStorage);
+    });
+    
+    // Add skill management button
+    const addSkillBtn = document.createElement('button');
+    addSkillBtn.className = 'admin-skill-btn';
+    addSkillBtn.innerHTML = '<i class="fas fa-plus"></i>';
+    addSkillBtn.title = 'Add New Skill';
+    addSkillBtn.onclick = () => addNewSkill(newCategory);
+    newCategory.appendChild(addSkillBtn);
+    
+    saveChangesToLocalStorage();
+    document.querySelector('.admin-modal').remove();
+    
+    // Show success message
+    const successMsg = document.createElement('div');
+    successMsg.className = 'admin-success-message';
+    successMsg.innerHTML = '<i class="fas fa-plus"></i> New skill category added!';
+    document.body.appendChild(successMsg);
+    setTimeout(() => successMsg.remove(), 3000);
+}
+
 // Inject admin styles
 const adminStyleSheet = document.createElement('style');
-adminStyleSheet.textContent = adminStyles;
+adminStyleSheet.textContent = adminStyles + `
+    .admin-skill-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: rgba(29, 185, 84, 0.8);
+        border: none;
+        color: #000000;
+        padding: 6px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+    
+    .admin-skill-btn:hover {
+        background: #1db954;
+        transform: scale(1.1);
+    }
+    
+    .admin-warning-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #ff9500;
+        color: #000000;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: fadeInOut 4s ease-in-out;
+    }
+`;
 document.head.appendChild(adminStyleSheet);

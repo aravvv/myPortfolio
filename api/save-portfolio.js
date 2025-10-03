@@ -65,12 +65,13 @@ export default function handler(req, res) {
             lastModified: new Date().toISOString()
         };
         
-        // For demonstration, we'll just return success
-        // In production, implement proper database storage
+        // Store in Vercel KV or simple JSON approach
+        // For now, we'll return the data so frontend can handle persistence
         return res.status(200).json({ 
             success: true, 
-            message: 'Portfolio data saved successfully',
-            timestamp: dataToSave.timestamp
+            message: 'Portfolio data processed successfully',
+            timestamp: dataToSave.timestamp,
+            savedData: dataToSave
         });
         
     } catch (error) {
