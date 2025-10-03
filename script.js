@@ -705,14 +705,10 @@ function initializeClickableSkillCategories() {
             // Toggle expanded class on clicked category
             this.classList.toggle('expanded');
             
-            // If expanding, scroll to center it in view
+            // If expanding, scroll to center it in the carousel only (not the page)
             if (this.classList.contains('expanded')) {
                 setTimeout(() => {
-                    this.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                        inline: 'center'
-                    });
+                    scrollToSkillCategory(this);
                 }, 100);
                 
                 // Add skill icons if not already present
