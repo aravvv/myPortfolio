@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTypingEffect();
     initializeParallaxEffect();
     initializeMusicPlayer();
+    initializeAdminMode();
 });
 
 // Music Player Data - Curated playlist with free music sources
@@ -917,3 +918,458 @@ const additionalStyles = `
 const styleSheet = document.createElement('style');
 styleSheet.textContent = additionalStyles;
 document.head.appendChild(styleSheet);
+
+// Admin Mode functionality
+let isAdminMode = false;
+let adminPassword = 'portfolio2024'; // Client-side only - NOT secure!
+
+function initializeAdminMode() {
+    const adminBtn = document.getElementById('adminBtn');
+    if (!adminBtn) return;
+    
+    adminBtn.addEventListener('click', handleAdminClick);
+    
+    // Check if admin mode is already active (stored in localStorage)
+    if (localStorage.getItem('adminMode') === 'true') {
+        enableAdminMode();
+    }
+}
+
+function handleAdminClick() {
+    if (!isAdminMode) {
+        showPasswordPrompt();
+    } else {
+        disableAdminMode();
+    }
+}
+
+function showPasswordPrompt() {
+    const modal = document.createElement('div');
+    modal.className = 'admin-modal';
+    modal.innerHTML = `
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3>Admin Access</h3>
+                <button class="close-modal" onclick="this.parentElement.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal-body">
+                <p>Enter admin password to enable editing mode:</p>
+                <input type="password" id="adminPasswordInput" placeholder="Password" 
+                       style="width: 100%; padding: 12px; margin: 16px 0; background: #282828; 
+                              border: 1px solid #404040; border-radius: 4px; color: #ffffff; outline: none;">
+                <div class="admin-modal-actions">
+                    <button class="admin-cancel-btn" onclick="this.closest('.admin-modal').remove()">Cancel</button>
+                    <button class="admin-submit-btn" onclick="verifyAdminPassword()">Access</button>
+                </div>
+                <div id="adminError" style="color: #ff6b6b; margin-top: 12px; display: none;">
+                    Incorrect password. Please try again.
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Focus on password input
+    setTimeout(() => {
+        document.getElementById('adminPasswordInput').focus();
+    }, 100);
+    
+    // Handle Enter key
+    document.getElementById('adminPasswordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            verifyAdminPassword();
+        }
+    });
+}
+
+function verifyAdminPassword() {
+    const passwordInput = document.getElementById('adminPasswordInput');
+    const errorDiv = document.getElementById('adminError');
+    const enteredPassword = passwordInput.value;
+    
+    // NOTE: This is client-side verification only - NOT secure for production!
+    // For production, this should be sent to a backend API route
+    if (enteredPassword === adminPassword) {
+        enableAdminMode();
+        document.querySelector('.admin-modal').remove();
+    } else {
+        errorDiv.style.display = 'block';
+        passwordInput.value = '';
+        passwordInput.focus();
+    }
+}
+
+function enableAdminMode() {
+    isAdminMode = true;
+    localStorage.setItem('adminMode', 'true');
+    
+    const adminBtn = document.getElementById('adminBtn');
+    adminBtn.classList.add('admin-mode');
+    adminBtn.innerHTML = '<i class="fas fa-edit"></i>';
+    adminBtn.title = 'Exit Admin Mode';
+    
+    // Make content editable
+    makeContentEditable();
+    
+    // Show save button
+    showSaveButton();
+    
+    // Show admin indicator
+    showAdminIndicator();
+}
+
+function disableAdminMode() {
+    isAdminMode = false;
+    localStorage.removeItem('adminMode');
+    
+    const adminBtn = document.getElementById('adminBtn');
+    adminBtn.classList.remove('admin-mode');
+    adminBtn.innerHTML = '<i class="fas fa-cog"></i>';
+    adminBtn.title = 'Admin Access';
+    
+    // Remove editable attributes
+    removeContentEditable();
+    
+    // Remove save button
+    removeSaveButton();
+    
+    // Remove admin indicator
+    removeAdminIndicator();
+}
+
+function makeContentEditable() {
+    // Make text content editable
+    const editableElements = document.querySelectorAll(
+        'h1, h2, h3, .hero-subtitle, .description, .project-description, ' +
+        '.company, .duration, .education-school, .education-grade, ' +
+        '.stat-number, .stat-label, .cert-info h3'
+    );
+    
+    editableElements.forEach(element => {
+        element.contentEditable = true;
+        element.classList.add('admin-editable');
+        element.addEventListener('blur', saveChangesToLocalStorage);
+    });
+    
+    // Add section management buttons
+    addSectionManagementButtons();
+}
+
+function removeContentEditable() {
+    const editableElements = document.querySelectorAll('.admin-editable');
+    editableElements.forEach(element => {
+        element.contentEditable = false;
+        element.classList.remove('admin-editable');
+    });
+    
+    // Remove management buttons
+    document.querySelectorAll('.admin-section-btn, .admin-add-section').forEach(btn => btn.remove());
+}
+
+function addSectionManagementButtons() {
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => {
+        if (section.querySelector('.admin-section-btn')) return; // Already has buttons
+        
+        const sectionControls = document.createElement('div');
+        sectionControls.className = 'admin-section-controls';
+        sectionControls.innerHTML = `
+            <button class="admin-section-btn admin-delete-section" onclick="deleteSection(this)" title="Delete Section">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        
+        section.appendChild(sectionControls);
+    });
+}
+
+function showSaveButton() {
+    if (document.querySelector('.admin-save-btn')) return; // Already exists
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'admin-save-btn';
+    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    saveBtn.onclick = saveAllChanges;
+    
+    document.body.appendChild(saveBtn);
+}
+
+function removeSaveButton() {
+    const saveBtn = document.querySelector('.admin-save-btn');
+    if (saveBtn) saveBtn.remove();
+}
+
+function showAdminIndicator() {
+    if (document.querySelector('.admin-indicator')) return; // Already exists
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'admin-indicator';
+    indicator.innerHTML = '<i class="fas fa-edit"></i> Admin Mode Active';
+    
+    document.body.appendChild(indicator);
+}
+
+function removeAdminIndicator() {
+    const indicator = document.querySelector('.admin-indicator');
+    if (indicator) indicator.remove();
+}
+
+function saveChangesToLocalStorage() {
+    // Save individual changes to localStorage as they're made
+    const portfolioData = {
+        timestamp: Date.now(),
+        content: {}
+    };
+    
+    const editableElements = document.querySelectorAll('.admin-editable');
+    editableElements.forEach((element, index) => {
+        portfolioData.content[`element_${index}`] = {
+            text: element.textContent,
+            html: element.innerHTML,
+            selector: getElementSelector(element)
+        };
+    });
+    
+    localStorage.setItem('portfolioChanges', JSON.stringify(portfolioData));
+}
+
+function saveAllChanges() {
+    saveChangesToLocalStorage();
+    
+    // Show success message
+    const successMsg = document.createElement('div');
+    successMsg.className = 'admin-success-message';
+    successMsg.innerHTML = '<i class="fas fa-check"></i> Changes saved successfully!';
+    
+    document.body.appendChild(successMsg);
+    
+    setTimeout(() => {
+        successMsg.remove();
+    }, 3000);
+}
+
+function getElementSelector(element) {
+    // Create a unique selector for the element
+    let selector = element.tagName.toLowerCase();
+    if (element.id) selector += `#${element.id}`;
+    if (element.className) selector += `.${element.className.split(' ').join('.')}`;
+    return selector;
+}
+
+function deleteSection(button) {
+    if (confirm('Are you sure you want to delete this section?')) {
+        button.closest('.content-section').remove();
+        saveChangesToLocalStorage();
+    }
+}
+
+// Admin Mode Styles
+const adminStyles = `
+    .admin-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    
+    .admin-modal-content {
+        background: #181818;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    
+    .admin-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #282828;
+    }
+    
+    .admin-modal-header h3 {
+        margin: 0;
+        color: #1db954;
+    }
+    
+    .close-modal {
+        background: none;
+        border: none;
+        color: #b3b3b3;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+    }
+    
+    .close-modal:hover {
+        color: #ffffff;
+    }
+    
+    .admin-modal-body {
+        padding: 20px;
+    }
+    
+    .admin-modal-body p {
+        color: #b3b3b3;
+        margin-bottom: 16px;
+    }
+    
+    .admin-modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+    
+    .admin-cancel-btn, .admin-submit-btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-cancel-btn {
+        background: #282828;
+        color: #b3b3b3;
+    }
+    
+    .admin-cancel-btn:hover {
+        background: #404040;
+        color: #ffffff;
+    }
+    
+    .admin-submit-btn {
+        background: #1db954;
+        color: #000000;
+    }
+    
+    .admin-submit-btn:hover {
+        background: #1ed760;
+    }
+    
+    .admin-editable {
+        border: 2px dashed transparent;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+        padding: 4px;
+    }
+    
+    .admin-editable:hover {
+        border-color: rgba(29, 185, 84, 0.5);
+        background: rgba(29, 185, 84, 0.05);
+    }
+    
+    .admin-editable:focus {
+        border-color: #1db954;
+        background: rgba(29, 185, 84, 0.1);
+        outline: none;
+    }
+    
+    .admin-section-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+    }
+    
+    .admin-section-btn {
+        background: rgba(255, 107, 107, 0.8);
+        border: none;
+        color: #ffffff;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-left: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-section-btn:hover {
+        background: #ff6b6b;
+        transform: scale(1.05);
+    }
+    
+    .admin-save-btn {
+        position: fixed;
+        bottom: 120px;
+        right: 20px;
+        background: #1db954;
+        color: #000000;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .admin-save-btn:hover {
+        background: #1ed760;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(29, 185, 84, 0.4);
+    }
+    
+    .admin-indicator {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: rgba(29, 185, 84, 0.9);
+        color: #000000;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .admin-success-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #1db954;
+        color: #000000;
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: fadeInOut 3s ease-in-out;
+    }
+    
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        10%, 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    
+    .content-section {
+        position: relative;
+    }
+`;
+
+// Inject admin styles
+const adminStyleSheet = document.createElement('style');
+adminStyleSheet.textContent = adminStyles;
+document.head.appendChild(adminStyleSheet);
